@@ -6,7 +6,7 @@ Time: 12:30 pm
 File: User.java */
 package com.github.prajjwal.florio.model.user;
 
-import com.github.prajjwal.florio.model.ServiceRequest;
+import com.github.prajjwal.florio.model.request.ServiceRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -55,7 +55,7 @@ public class User implements UserDetails{
     private String state;
     private String zipCode;
 
-    // for service makers
+    // for service partners
     private String specialization;
     private Double rating;
     private boolean isAvailable = false;
@@ -77,8 +77,8 @@ public class User implements UserDetails{
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<ServiceRequest> customerRequests;
 
-    @OneToMany(mappedBy = "serviceProvider", cascade = CascadeType.ALL)
-    private List<ServiceRequest> providerRequests;
+    @OneToMany(mappedBy = "servicePartner", cascade = CascadeType.ALL)
+    private List<ServiceRequest> partnerRequests;
 
     @PrePersist
     public void onCreate() {
