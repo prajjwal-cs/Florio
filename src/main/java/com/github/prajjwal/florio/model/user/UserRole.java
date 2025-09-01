@@ -8,6 +8,6 @@ package com.github.prajjwal.florio.model.user;
 
 public enum UserRole {
     ADMIN,
-    USER,
-    SERVICE_PROVIDER
+    CUSTOMER,
+    SERVICE_PARTNER
 }
