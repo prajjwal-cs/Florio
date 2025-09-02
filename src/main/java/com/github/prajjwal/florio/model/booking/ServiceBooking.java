@@ -45,7 +45,7 @@ public class ServiceBooking {
     private LocalDateTime prefferedDate;
 
     @Enumerated(EnumType.STRING)
-    private RequestStatus status = RequestStatus.PENDING;
+    private ServiceStatus status = ServiceStatus.PENDING;
 
     @Column(name = "estimated_price")
     private Double estimatedPrice;
