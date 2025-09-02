@@ -6,5 +6,5 @@ Time: 6:19 pm
 File: RegisterRequest.java */
 package com.github.prajjwal.florio.dto;
 
-public class RegisterRequest {
+public class RegisterDto {
 }
