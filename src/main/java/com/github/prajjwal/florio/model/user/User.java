@@ -12,6 +12,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,7 +24,7 @@ import java.util.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails{
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
@@ -111,7 +112,7 @@ public class User implements UserDetails{
     }
 
     @Override
-    public boolean isCredentialNonExpired() {
+    public boolean isCredentialsNonExpired() {
         return true;
     }
 
