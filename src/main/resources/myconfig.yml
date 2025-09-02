@@ -1,8 +1,8 @@
 mail:
   host: smtp.gmail.com
   port: 587
-  username: ${EMAIL_USERNAME}
-  password: ${EMAIL_PASSWORD}
+  username: ${EMAIL_USERNAME:prajjwal200075@gmail.com}
+  password: ${EMAIL_PASSWORD:password}
   properties:
     mail:
       smtp:
@@ -11,7 +11,7 @@ mail:
           enable: true
 
 jwt:
-  secret: ${JWT_SECRET:mySecretKey}
+  secret: ${JWT_SECRET:myVerySecretKeyThatIsAtLeast32CharactersLong123456}
   expiration: 43200000
 
 otp:
