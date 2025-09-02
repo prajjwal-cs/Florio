@@ -2,7 +2,7 @@
 
 Author: Prajjwal Pachauri
 Date: 28-08-2025
-Time: 6:35 pm
+Time: 6:35pm
 File: CustomAuthenticationEntryPoint.java */
 package com.github.prajjwal.florio.config;
 
@@ -19,15 +19,17 @@ import java.io.IOException;
 import java.io.Serializable;
 
 @Component
-public class CustomAuthenticationEntryPoint extends OncePerRequestFilter implements AuthenticationEntryPoint, Serializable {
+public class JwtAuthenticationEntryPoint extends OncePerRequestFilter implements AuthenticationEntryPoint, Serializable {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+            throws IOException, ServletException {
 
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
     }
 }
