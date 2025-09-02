@@ -6,7 +6,7 @@ Time: 12:30 pm
 File: User.java */
 package com.github.prajjwal.florio.model.user;
 
-import com.github.prajjwal.florio.model.request.ServiceRequest;
+import com.github.prajjwal.florio.model.booking.ServiceBooking;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -75,10 +75,10 @@ public class User implements UserDetails{
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<ServiceRequest> customerRequests;
+    private List<ServiceBooking> customerRequests;
 
     @OneToMany(mappedBy = "servicePartner", cascade = CascadeType.ALL)
-    private List<ServiceRequest> partnerRequests;
+    private List<ServiceBooking> partnerRequests;
 
     @PrePersist
     public void onCreate() {

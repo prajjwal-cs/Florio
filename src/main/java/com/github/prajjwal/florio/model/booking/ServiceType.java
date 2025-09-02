@@ -1,4 +1,4 @@
-package com.github.prajjwal.florio.model.request;
+package com.github.prajjwal.florio.model.booking;
 
 public enum ServiceType {
     FAN,

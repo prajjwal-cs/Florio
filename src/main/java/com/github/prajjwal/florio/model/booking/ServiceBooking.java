@@ -4,14 +4,11 @@ Author: Prajjwal Pachauri
 Date: 29-08-2025
 Time: 4:46 pm
 File: ServiceRequest.java */
-package com.github.prajjwal.florio.model.request;
+package com.github.prajjwal.florio.model.booking;
 
 import com.github.prajjwal.florio.model.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -22,9 +19,9 @@ import java.util.UUID;
 @Table(name = "service_request")
 @Getter
 @Setter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @NoArgsConstructor
-public class ServiceRequest {
+public class ServiceBooking {
     @Id
     @UuidGenerator
     private UUID id;
@@ -68,7 +65,7 @@ public class ServiceRequest {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        ServiceRequest that = (ServiceRequest) o;
+        ServiceBooking that = (ServiceBooking) o;
         return Objects.equals(id, that.id) && Objects.equals(customer, that.customer) && Objects.equals(servicePartner, that.servicePartner) && serviceType == that.serviceType && Objects.equals(description, that.description) && Objects.equals(address, that.address) && Objects.equals(prefferedDate, that.prefferedDate) && status == that.status && Objects.equals(estimatedPrice, that.estimatedPrice) && Objects.equals(finalPrice, that.finalPrice) && Objects.equals(createdAt, that.createdAt) && Objects.equals(completedAt, that.completedAt) && Objects.equals(rating, that.rating) && Objects.equals(feedback, that.feedback);
     }
 

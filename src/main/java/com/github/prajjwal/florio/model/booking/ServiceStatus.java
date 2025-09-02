@@ -4,9 +4,9 @@ Author: Prajjwal Pachauri
 Date: 28-08-2025
 Time: 6:26 pm
 File: RequestStatus.java */
-package com.github.prajjwal.florio.model.request;
+package com.github.prajjwal.florio.model.booking;
 
-public enum RequestStatus {
+public enum ServiceStatus {
     PENDING,
     ACCEPTED,
     IN_PROGRESS,
