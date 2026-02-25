@@ -6,6 +6,7 @@ Time: 2:09 pm
 File: JwtAuthenticationFilter.java */
 package com.github.prajjwal.florio.config;
 
+import com.github.prajjwal.florio.util.CustomUserDetailsService;
 import com.github.prajjwal.florio.util.JwtTokenUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -14,12 +15,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,7 +31,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
 
     @Override
