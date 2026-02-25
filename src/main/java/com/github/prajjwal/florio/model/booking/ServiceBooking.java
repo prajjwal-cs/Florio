@@ -19,11 +19,9 @@ import java.util.UUID;
 @Table(name = "service_request")
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor
 public class ServiceBooking {
     @Id
-    @UuidGenerator
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
