@@ -1,14 +1,15 @@
-mail:
-  host: smtp.gmail.com
-  port: 587
-  username: ${EMAIL_USERNAME:prajjwal200075@gmail.com}
-  password: ${EMAIL_PASSWORD:password}
-  properties:
-    mail:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME:prajjwal200075@gmail.com}
+    password: ${EMAIL_PASSWORD:password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   secret: ${JWT_SECRET:myVerySecretKeyThatIsAtLeast32CharactersLong123456}
