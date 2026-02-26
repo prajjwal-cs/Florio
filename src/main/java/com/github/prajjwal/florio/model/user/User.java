@@ -8,14 +8,19 @@ package com.github.prajjwal.florio.model.user;
 
 import com.github.prajjwal.florio.model.booking.ServiceBooking;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -26,7 +31,6 @@ import java.util.*;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private UUID userId;
 
     @Column(nullable = false, unique = true)
@@ -51,7 +55,7 @@ public class User implements UserDetails {
 
     @Column(columnDefinition = "TEXT")
     private String address;
-    private  String city;
+    private String city;
     private String state;
     private String zipCode;
 
@@ -70,9 +74,9 @@ public class User implements UserDetails {
     private boolean emailVerified = false;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<ServiceBooking> customerRequests;
@@ -82,13 +86,13 @@ public class User implements UserDetails {
 
     @PrePersist
     public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     @PreUpdate
     public void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = Instant.now();
     }
 
     @Override
@@ -98,8 +102,9 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
