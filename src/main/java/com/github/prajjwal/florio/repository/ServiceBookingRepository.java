@@ -17,8 +17,5 @@ import java.util.UUID;
 
 @Repository
 public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, UUID> {
-    List<ServiceBooking> findByCustomerId(UUID customerId);
-    List<ServiceBooking> findByServicePartnerId(UUID servicePartnerId);
-    List<ServiceBooking> findByStatus(ServiceStatus status);
-    List<ServiceBooking> findByServiceTypeAndStatus(ServiceType serviceType, ServiceStatus status);
+
 }

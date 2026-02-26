@@ -8,10 +8,10 @@ package com.github.prajjwal.florio.model.booking;
 
 import com.github.prajjwal.florio.model.user.User;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,8 +39,8 @@ public class ServiceBooking {
 
     private String address;
 
-    @Column(name = "preffered_date")
-    private LocalDateTime prefferedDate;
+    @Column(name = "preferred_date")
+    private Instant preferredDate;
 
     @Enumerated(EnumType.STRING)
     private ServiceStatus status = ServiceStatus.PENDING;
@@ -51,44 +51,30 @@ public class ServiceBooking {
     @Column(name = "final_price")
     private Double finalPrice;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
     @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    private Instant completedAt;
 
     private Integer rating;
     private String feedback;
 
+    @PrePersist
+    public void onCreate() {
+        createdAt = Instant.now();
+    }
+
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ServiceBooking that = (ServiceBooking) o;
-        return Objects.equals(id, that.id) && Objects.equals(customer, that.customer) && Objects.equals(servicePartner, that.servicePartner) && serviceType == that.serviceType && Objects.equals(description, that.description) && Objects.equals(address, that.address) && Objects.equals(prefferedDate, that.prefferedDate) && status == that.status && Objects.equals(estimatedPrice, that.estimatedPrice) && Objects.equals(finalPrice, that.finalPrice) && Objects.equals(createdAt, that.createdAt) && Objects.equals(completedAt, that.completedAt) && Objects.equals(rating, that.rating) && Objects.equals(feedback, that.feedback);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, customer, servicePartner, serviceType, description, address, prefferedDate, status, estimatedPrice, finalPrice, createdAt, completedAt, rating, feedback);
-    }
-
-    @Override
-    public String toString() {
-        return "ServiceRequest{" +
-                "id=" + id +
-                ", customer=" + customer +
-                ", servicePartner=" + servicePartner +
-                ", serviceType=" + serviceType +
-                ", description='" + description + '\'' +
-                ", address='" + address + '\'' +
-                ", prefferedDate=" + prefferedDate +
-                ", status=" + status +
-                ", estimatedPrice=" + estimatedPrice +
-                ", finalPrice=" + finalPrice +
-                ", createdAt=" + createdAt +
-                ", completedAt=" + completedAt +
-                ", rating=" + rating +
-                ", feedback='" + feedback + '\'' +
-                '}';
+        return Objects.hashCode(id);
     }
 }
