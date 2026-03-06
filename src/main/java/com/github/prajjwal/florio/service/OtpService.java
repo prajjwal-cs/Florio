@@ -2,6 +2,7 @@ package com.github.prajjwal.florio.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,14 @@ public class OtpService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final StringRedisTemplate redisTemplate;
+
+    @Value("${app.otp.expiry-minutes}")
     private int otpExpiryInMinutes;
+
+    @Value("${app.otp.max-attempts}")
     private int maxAttempts;
+
+    @Value("${app.otp.cooldown-seconds}")
     private int cooldownSeconds;
 
     public OtpService(PasswordEncoder passwordEncoder, EmailService emailService, StringRedisTemplate redisTemplate) {
@@ -29,7 +36,7 @@ public class OtpService {
         this.redisTemplate = redisTemplate;
     }
 
-    private void generateAndSend(String email) {
+    public void generateAndSend(String email) {
         if (isOnCooldown(email)) {
             throw new IllegalStateException("Please wait " + cooldownSeconds +
                     "seconds before sending a new OTP");
