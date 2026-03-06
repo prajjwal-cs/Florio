@@ -82,7 +82,7 @@ public class AuthService {
         log.info("Email {} verified successfully", email);
     }
 
-    private void resendOtp(String email) {
+    public void resendOtp(String email) {
         if (!userRepository.existsByEmail(email)) {
             log.warn("OTP resend requested for unknown email {}", email);
             return;
