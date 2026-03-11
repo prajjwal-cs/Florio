@@ -57,7 +57,7 @@ public class ServiceBooking {
     @Column(name = "completed_at")
     private Instant completedAt;
 
-    private Integer rating;
+    private Double rating;
     private String feedback;
 
     @PrePersist
