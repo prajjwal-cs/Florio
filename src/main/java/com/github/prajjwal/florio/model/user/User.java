@@ -17,6 +17,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +73,12 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private boolean emailVerified = false;
+
+    @Column(nullable = false)
+    private int failedAttempts = 0;
+
+    @Column(name = "lockout_time")
+    private LocalDateTime lockoutTime;
 
     @Column(name = "created_at")
     private Instant createdAt;
