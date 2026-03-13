@@ -24,7 +24,7 @@ public class ServiceBookingResponseDto {
     private Double finalPrice;
     private Instant createdAt;
     private Instant completedAt;
-    private Double rating;
+    private Integer rating;
     private String feedback;
 
 }

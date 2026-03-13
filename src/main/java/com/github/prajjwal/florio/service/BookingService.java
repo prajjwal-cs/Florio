@@ -9,6 +9,7 @@ import com.github.prajjwal.florio.model.user.UserRole;
 import com.github.prajjwal.florio.repository.ServiceBookingRepository;
 import com.github.prajjwal.florio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
@@ -52,8 +53,9 @@ public class BookingService {
         return bookingRepository.findByCustomer(customer, pageable).map(this::changeToResponse);
     }
 
+    @SneakyThrows
     @Transactional(readOnly = true)
-    public ServiceBookingResponseDto getBookingById(String requestEmail, UUID id) throws AccessDeniedException {
+    public ServiceBookingResponseDto getBookingById(String requestEmail, UUID id) {
         ServiceBooking booking = findBookingOrThrow(id);
         User requester = findUserByEmailOrThrow(requestEmail);
 
@@ -69,8 +71,9 @@ public class BookingService {
         return changeToResponse(booking);
     }
 
+    @SneakyThrows
     @Transactional
-    public ServiceBookingResponseDto chancelBooking(String customerEmail, UUID id) throws AccessDeniedException {
+    public ServiceBookingResponseDto cancelBooking(String customerEmail, UUID id) {
         ServiceBooking booking = findBookingOrThrow(id);
 
         if (!booking.getCustomer().getEmail().equals(customerEmail)) {
@@ -87,10 +90,10 @@ public class BookingService {
         return changeToResponse(booking);
     }
 
+    @SneakyThrows
     @Transactional
     public ServiceBookingResponseDto submitFeedback(String customerEmail, UUID bookingId,
-                                                    Double rating, String feedback)
-            throws AccessDeniedException {
+                                                    Integer rating, String feedback) {
         ServiceBooking booking = findBookingOrThrow(bookingId);
         if (!booking.getCustomer().getEmail().equals(customerEmail)) {
             throw new AccessDeniedException("You can only rate your own bookings");
@@ -140,9 +143,10 @@ public class BookingService {
         return changeToResponse(booking);
     }
 
+    @SneakyThrows
     @Transactional
     public ServiceBookingResponseDto updateJobStatus(String partnerEmail, UUID bookingId,
-                                                     ServiceStatus newStatus) throws AccessDeniedException {
+                                                     ServiceStatus newStatus) {
         ServiceBooking booking = findBookingOrThrow(bookingId);
 
         if (booking.getServicePartner() == null ||
