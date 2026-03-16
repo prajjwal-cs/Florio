@@ -44,7 +44,7 @@ public class AuthService {
     private int lockoutDurationInMinutes;
 
     @Transactional
-    public void registerUser(RegistrationRequestDto register) {
+    public void register(RegistrationRequestDto register) {
         if (userRepository.existsByEmail(register.getEmail())) {
             log.warn("User already exist with email {}", register.getEmail());
         }
@@ -77,6 +77,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setEmailVerified(true);
+        user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
 
         log.info("Email {} verified successfully", email);
@@ -98,7 +99,7 @@ public class AuthService {
                 .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
         //pre-auth checks
-        if (user.getStatus() != UserStatus.BLOCKED) {
+        if (user.getStatus() == UserStatus.BLOCKED) {
             throw new LockedException("Account is permanently blocked. Contact support.");
         }
         if (!user.isEmailVerified()) {

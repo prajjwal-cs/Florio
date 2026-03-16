@@ -61,6 +61,9 @@ public class OtpService {
     }
 
     public void verify(String email, String rawOtp) {
+        log.debug("Verifying OTP for email='{}', otp='{}'", email, rawOtp);
+        log.debug("Redis key lookup: '{}'", OTP_HASH_KEY + email);
+        log.debug("Stored hash exists: {}", redisTemplate.hasKey(OTP_HASH_KEY + email));
         String attemptStr = redisTemplate.opsForValue().get(OTP_ATTEMPTS_KEY + email);
         int attempts = attemptStr != null ? Integer.parseInt(attemptStr) : 0;
         if (attempts >= maxAttempts) {
