@@ -24,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegistrationRequestDto request) {
-        authService.register(request);
+        authService.registerCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "Registration Successful, verify your email."));
     }
@@ -57,4 +57,6 @@ public class AuthController {
         authService.logout(userDetails.getUsername());
         return ResponseEntity.ok(Map.of("message", "Logged out successfully!"));
     }
+
+    // todo -> forgot password
 }

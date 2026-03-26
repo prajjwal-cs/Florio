@@ -4,10 +4,12 @@ import com.github.prajjwal.florio.dto.ServiceBookingRequestDto;
 import com.github.prajjwal.florio.dto.ServiceBookingResponseDto;
 import com.github.prajjwal.florio.model.booking.ServiceBooking;
 import com.github.prajjwal.florio.model.booking.ServiceStatus;
+import com.github.prajjwal.florio.model.booking.ServiceType;
 import com.github.prajjwal.florio.model.user.User;
 import com.github.prajjwal.florio.model.user.UserRole;
 import com.github.prajjwal.florio.repository.ServiceBookingRepository;
 import com.github.prajjwal.florio.repository.UserRepository;
+import jdk.dynalink.linker.LinkerServices;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
@@ -20,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -36,14 +40,30 @@ public class BookingService {
 
         ServiceBooking booking = new ServiceBooking();
         booking.setCustomer(customer);
-        booking.setServiceType(request.getServiceType());
+        booking.setServiceType(ServiceType.valueOf(request.getServiceType()));
         booking.setDescription(request.getDescription());
         booking.setAddress(request.getAddress());
         booking.setPreferredDate(request.getPreferredDateTime());
         booking.setStatus(ServiceStatus.PENDING);
 
         ServiceBooking saved = bookingRepository.save(booking);
+
         log.info("Booking created bookingId={} by email={}", saved.getId(), customerEmail);
+
+        List<User> matchingPartners = userRepository.findAvailablePartnersByCityAndSpecialization(
+                customer.getCity(),
+                request.getServiceType()
+        );
+
+        if (!matchingPartners.isEmpty()) {
+            // 1. auto assign partners
+            booking.setServicePartner(matchingPartners.getFirst());
+            booking.setStatus(ServiceStatus.ACCEPTED);
+            bookingRepository.save(booking);
+
+            // todo 2. Notify all matching partners (they accept via Available Jobs tab)
+        }
+
         return changeToResponse(saved);
     }
 
@@ -145,19 +165,20 @@ public class BookingService {
 
     @SneakyThrows
     @Transactional
-    public ServiceBookingResponseDto updateJobStatus(String partnerEmail, UUID bookingId,
-                                                     ServiceStatus newStatus) {
+    public ServiceBookingResponseDto updateJobStatus(String identifier, UUID bookingId,
+                                                     String newStatus) {
         ServiceBooking booking = findBookingOrThrow(bookingId);
+        User user = findUserByEmailOrThrow(identifier);
 
         if (booking.getServicePartner() == null ||
-                !booking.getServicePartner().getEmail().equals(partnerEmail)) {
+                !booking.getServicePartner().getEmail().equals(user.getEmail())) {
             throw new AccessDeniedException("You are not assigned to this job");
         }
 
-        validateStatusTransition(booking.getStatus(), newStatus);
+        validateStatusTransition(booking.getStatus(), ServiceStatus.valueOf(newStatus));
 
-        booking.setStatus(newStatus);
-        if (newStatus == ServiceStatus.COMPLETED) {
+        booking.setStatus(ServiceStatus.valueOf(newStatus));
+        if (Objects.equals(newStatus, "COMPLETED")) {
             booking.setCompletedAt(Instant.now());
             incrementPartnerJobCount(booking.getServicePartner());
         }
@@ -231,8 +252,9 @@ public class BookingService {
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
     }
 
-    private User findUserByEmailOrThrow(String email) {
-        return userRepository.findByEmail(email)
+    private User findUserByEmailOrThrow(String identifier) {
+        return userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByUsername(identifier))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
     }
 

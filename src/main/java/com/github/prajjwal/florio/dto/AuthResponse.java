@@ -1,5 +1,6 @@
 package com.github.prajjwal.florio.dto;
 
+import com.github.prajjwal.florio.model.user.User;
 import com.github.prajjwal.florio.model.user.UserRole;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ public class AuthResponse {
     private String accessToken;
     private String refreshToken;
     private String tokenType;
-    private UserRole role;
+//    private UserRole role;
+    private UserDto user;
     private String email;
 }

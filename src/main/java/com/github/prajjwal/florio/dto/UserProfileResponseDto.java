@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -17,7 +16,7 @@ public class UserProfileResponseDto {
     private String username;
     private String firstName;
     private String lastName;
-    private String phoneNumber;
+    private String phone;
     private String address;
     private String city;
     private String state;

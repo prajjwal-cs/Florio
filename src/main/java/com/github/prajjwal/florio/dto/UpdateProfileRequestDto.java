@@ -6,7 +6,7 @@ import lombok.Data;
 public class UpdateProfileRequestDto {
     private String firstName;
     private String lastName;
-    private String phoneNumber;
+    private String phone;
     private String address;
     private String city;
     private String state;
@@ -14,5 +14,4 @@ public class UpdateProfileRequestDto {
 
     private String specialization;
     private String experience;
-    private Boolean isAvailable;
 }

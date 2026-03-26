@@ -48,9 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken = authHeader.substring(7);
 
         try {
-            String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            String identifier = jwtTokenUtil.getUsernameFromToken(jwtToken);
+            if (identifier != null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(identifier);
 
                 if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             );
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    log.debug("Jwt authentication set for user={} on path={}", username, request.getRequestURI());
+                    log.debug("Jwt authentication set for user={} on path={}", identifier, request.getRequestURI());
                 }
             }
         } catch (JwtException | IllegalArgumentException ex) {

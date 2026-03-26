@@ -8,7 +8,6 @@ import com.github.prajjwal.florio.model.user.UserStatus;
 import com.github.prajjwal.florio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -43,8 +42,8 @@ public class UserService {
         if (request.getLastName() != null) {
             user.setLastName(request.getLastName());
         }
-        if (request.getPhoneNumber() != null) {
-            user.setPhoneNumber(request.getPhoneNumber());
+        if (request.getPhone() != null) {
+            user.setPhoneNumber(request.getPhone());
         }
         if (request.getAddress() != null) {
             user.setAddress(request.getAddress());
@@ -63,9 +62,6 @@ public class UserService {
         }
         if (request.getExperience() != null) {
             user.setExperience(request.getExperience());
-        }
-        if (request.getIsAvailable() != null) {
-            user.setAvailable(request.getIsAvailable());
         }
 
         userRepository.save(user);
@@ -119,6 +115,22 @@ public class UserService {
         log.info("User unblocked with username={}", user.getUsername());
     }
 
+    @Transactional
+    public Boolean getAvailability(String username) {
+        User user = findByEmailOrThrow(username);
+
+        return user.getIsAvailable();
+    }
+
+    @Transactional
+    public void toggleAvailability(String username, Boolean isActive) {
+        User user = findByEmailOrThrow(username);
+        user.setIsAvailable(isActive);
+        userRepository.save(user);
+        System.out.println("OLD: " + user.getIsAvailable());
+        System.out.println("NEW: " + isActive);
+    }
+
 
 
     public UserProfileResponseDto changeToResponse(User user) {
@@ -128,7 +140,7 @@ public class UserService {
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .phoneNumber(user.getPhoneNumber())
+                .phone(user.getPhoneNumber())
                 .address(user.getAddress())
                 .city(user.getCity())
                 .state(user.getState())
@@ -139,14 +151,15 @@ public class UserService {
                 .createdAt(user.getCreatedAt())
                 .specialization(user.getSpecialization())
                 .rating(user.getRating())
-                .isAvailable(user.isAvailable())
+                .isAvailable(user.getIsAvailable())
                 .experience(user.getExperience())
                 .totalJobs(user.getTotalJobs())
                 .build();
     }
 
-    private User findByEmailOrThrow(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    private User findByEmailOrThrow(String identifier) {
+        return userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByUsername(identifier))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + identifier));
     }
 }

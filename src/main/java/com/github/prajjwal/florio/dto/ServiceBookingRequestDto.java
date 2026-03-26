@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ServiceBookingRequestDto {
-    private ServiceType serviceType;
+    private String serviceType;
     private String description;
     private String address;
     private Instant preferredDateTime;

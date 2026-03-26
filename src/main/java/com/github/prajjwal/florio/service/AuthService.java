@@ -1,9 +1,6 @@
 package com.github.prajjwal.florio.service;
 
-import com.github.prajjwal.florio.dto.AuthResponse;
-import com.github.prajjwal.florio.dto.LoginRequestDto;
-import com.github.prajjwal.florio.dto.RegistrationRequestDto;
-import com.github.prajjwal.florio.dto.TokenRefreshRequestDto;
+import com.github.prajjwal.florio.dto.*;
 import com.github.prajjwal.florio.model.RefreshToken;
 import com.github.prajjwal.florio.model.user.User;
 import com.github.prajjwal.florio.model.user.UserRole;
@@ -44,30 +41,56 @@ public class AuthService {
     private int lockoutDurationInMinutes;
 
     @Transactional
-    public void register(RegistrationRequestDto register) {
-        if (userRepository.existsByEmail(register.getEmail())) {
-            log.warn("User already exist with email {}", register.getEmail());
+    public void registerCustomer(RegistrationRequestDto register) {
+        User user = checkUserExistAndRegister(register);
+        if ("WORKER".equals(register.getRole())) {
+            throw new IllegalArgumentException("Service Partner accounts must be created by admin.");
         }
-        if (userRepository.existsByUsername(register.getUsername())) {
+
+        userRepository.save(user);
+        log.info("Customer {} registered successfully", register.getUsername());
+
+        otpService.generateAndSend(user.getEmail());
+    }
+
+    @Transactional
+    public void registerWorker(RegistrationRequestDto request) {
+        User user = checkUserExistAndRegister(request);
+        user.setIsAvailable(false);
+        user.setExperience(request.getExperience());
+        user.setCity(request.getCity());
+        user.setRating(0.0);
+        user.setSpecialization(request.getSpecialization());
+
+        userRepository.save(user);
+        log.info("Service Partner {} registered successfully", request.getUsername());
+
+        otpService.generateAndSend(user.getEmail());
+    }
+
+    private User checkUserExistAndRegister(RegistrationRequestDto request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            log.warn("User already exist with email {}", request.getEmail());
+            throw new IllegalArgumentException("Email already exists");
+        }
+        if (userRepository.existsByUsername(request.getUsername())) {
             log.warn("Username already taken");
+            throw new IllegalArgumentException("Username already taken");
         }
 
         User user = new User();
-        user.setUsername(register.getUsername());
-        user.setEmail(register.getEmail());
-        user.setPassword(passwordEncoder.encode(register.getPassword()));
-        user.setFirstName(register.getFirstName());
-        user.setLastName(register.getLastName());
-        user.setPhoneNumber(register.getPhoneNumber());
-        user.setRole(UserRole.USER);
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setRole(UserRole.valueOf(request.getRole()));
         user.setStatus(UserStatus.ACTIVE);
         user.setEmailVerified(false);
         user.setFailedAttempts(0);
 
-        userRepository.save(user);
-        log.info("User {} registered successfully", register.getUsername());
-
-        otpService.generateAndSend(user.getEmail());
+        return user;
     }
 
     @Transactional
@@ -95,7 +118,8 @@ public class AuthService {
     // LOGIN ----
     @Transactional
     public AuthResponse login(LoginRequestDto loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail())
+        User user = userRepository.findByEmail(loginRequest.getIdentifier())
+                .or(() -> userRepository.findByUsername(loginRequest.getIdentifier()))
                 .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
         //pre-auth checks
@@ -112,7 +136,7 @@ public class AuthService {
 
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(loginRequest.getIdentifier(), loginRequest.getPassword())
             );
         } catch (BadCredentialsException ex) {
             handleFailedAttempts(user);
@@ -125,6 +149,7 @@ public class AuthService {
         }
 
         resetFailedAttempts(user);
+        refreshTokenRepository.revokeAllByUser(user);
         String accessToken = jwtTokenUtil.generateToken(user);
         String refreshToken = createRefreshToken(user);
 
@@ -189,6 +214,8 @@ public class AuthService {
         }
         resetFailedAttempts(user);
 
+        refreshTokenRepository.revokeAllByUser(user);
+
         String accessToken = jwtTokenUtil.generateToken(user);
         String refreshToken = createRefreshToken(user);
 
@@ -210,7 +237,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
         user.setPhoneNumber("");
         user.setStatus(UserStatus.ACTIVE);
-        user.setRole(UserRole.USER);
+        user.setRole(UserRole.CUSTOMER);
         user.setEmailVerified(true);
         user.setFailedAttempts(0);
 
@@ -263,7 +290,13 @@ public class AuthService {
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .email(user.getEmail())
-                .role(user.getRole())
+                .user(UserDto.builder()
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .role(user.getRole().name())
+                        .build())
                 .build();
     }
 }

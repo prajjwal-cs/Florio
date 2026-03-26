@@ -7,6 +7,7 @@ File: User.java */
 package com.github.prajjwal.florio.model.user;
 
 import com.github.prajjwal.florio.model.booking.ServiceBooking;
+import com.github.prajjwal.florio.model.booking.ServiceType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -63,7 +64,7 @@ public class User implements UserDetails {
     // for service partners
     private String specialization;
     private Double rating;
-    private boolean isAvailable = false;
+    private Boolean isAvailable = false;
     private String documentVerification;
     private String experience;
     private Integer totalJobs = 0;

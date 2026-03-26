@@ -1,13 +1,17 @@
 package com.github.prajjwal.florio.controller;
 
+import com.github.prajjwal.florio.dto.RegistrationRequestDto;
 import com.github.prajjwal.florio.dto.ServiceBookingResponseDto;
 import com.github.prajjwal.florio.dto.UserProfileResponseDto;
+import com.github.prajjwal.florio.service.AuthService;
 import com.github.prajjwal.florio.service.BookingService;
 import com.github.prajjwal.florio.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +24,16 @@ import java.util.UUID;
 public class AdminController {
     private final UserService userService;
     private final BookingService bookingService;
+    private final AuthService authService;
+
+    @PostMapping("/workers/register")
+    public ResponseEntity<Map<String, String>> registerWorker(
+            @Valid @RequestBody RegistrationRequestDto request) {
+        request.setRole("WORKER");
+        authService.registerWorker(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Service Partner registered successfully."));
+    }
 
     @GetMapping("/users")
     public ResponseEntity<Page<UserProfileResponseDto>> getALlUsers(

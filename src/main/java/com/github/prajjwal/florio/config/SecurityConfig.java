@@ -23,6 +23,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.time.Instant;
 import java.util.List;
@@ -58,14 +61,40 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowCredentials(true);
+        config.setAllowedHeaders(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**", "/oauth2/**",
-                                "/login/oauth2/**", "/error").permitAll()
+                                "/login/oauth2/**", "/error", "/static/**",
+                                "/",
+                                "/index.html",
+                                "/manifest.json",
+                                "/favicon.png",
+                                "/favicon.ico",
+                                "/runtime-config.js",
+                                "/service-worker.js",
+                                "/service-worker.js.map",
+                                "/.well-known/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/job-worker/**").hasRole("JOB_WORKER")
-                        .requestMatchers("/api/v1/users/**").hasRole("USER")
+                        .requestMatchers("/api/v1/job-worker/**").hasRole("WORKER")
+                        .requestMatchers("/api/v1/users/me").hasAnyAuthority(
+                                "ROLE_CUSTOMER", "ROLE_WORKER", "OAUTH2_USER")
+                        .requestMatchers("/api/v1/users/**").hasAnyRole("CUSTOMER", "WORKER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oAuth2 -> oAuth2
@@ -83,7 +112,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler())
                 )
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authenticationProvider(daoAuthenticationProvider);
 
